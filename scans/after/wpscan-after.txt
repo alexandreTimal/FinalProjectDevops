@@ -1,0 +1,77 @@
+[32m[+][0m URL: http://localhost:8081/ [127.0.0.1]
+[32m[+][0m Started: Wed May 20 08:19:33 2026
+[32m[+][0m Command Line: wpscan --url http://localhost:8081 --enumerate u,vp,vt --plugins-detection mixed --api-token [REDACTED] --no-banner --format cli
+[32m[+][0m Hostname: alexandre-Precision-5570
+
+Interesting Finding(s):
+
+[32m[+][0m Headers
+ | Interesting Entries:
+ |  - Server: Apache
+ |  - Referrer-Policy: strict-origin-when-cross-origin
+ | Found By: Headers (Passive Detection)
+ | Confidence: 100%
+
+[32m[+][0m WordPress readme found: http://localhost:8081/readme.html
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 100%
+
+[32m[+][0m The external WP-Cron seems to be enabled: http://localhost:8081/wp-cron.php
+ | Found By: Direct Access (Aggressive Detection)
+ | Confidence: 60%
+ | References:
+ |  - https://www.iplocation.net/defend-wordpress-from-ddos
+ |  - https://github.com/wpscanteam/wpscan/issues/1299
+
+[32m[+][0m WordPress version 6.8.3 identified (Insecure, released on 2025-09-30).
+ | Found By: Rss Generator (Passive Detection)
+ |  - http://localhost:8081/?feed=rss2, <generator>https://wordpress.org/?v=6.8.3</generator>
+ | Confirmed By: Rss Generator (Passive Detection)
+ |  - http://localhost:8081/?feed=comments-rss2, <generator>https://wordpress.org/?v=6.8.3</generator>
+
+[32m[+][0m WordPress theme in use: twentytwentyfive
+ | Location: http://localhost:8081/wp-content/themes/twentytwentyfive/
+ | Last Updated: 2025-12-03 12:00am GMT (5 months ago, per WordPress.org)
+ | Active Installs: 1,000,000 (per WordPress.org)
+ | Readme: http://localhost:8081/wp-content/themes/twentytwentyfive/readme.txt
+ | [33m[!][0m The version is out of date, the latest version is 1.4
+ | Style URL: http://localhost:8081/wp-content/themes/twentytwentyfive/style.css?ver=1.3
+ | Style Name: Twenty Twenty-Five
+ | Style URI: https://wordpress.org/themes/twentytwentyfive/
+ | Description: Twenty Twenty-Five emphasizes simplicity and adaptability. It offers flexible design options, suppor...
+ | Author: the WordPress team
+ | Author URI: https://wordpress.org
+ |
+ | Found By: Css Style In Homepage (Passive Detection)
+ |
+ | Version: 1.3 (80% confidence)
+ | Found By: Style (Passive Detection)
+ |  - http://localhost:8081/wp-content/themes/twentytwentyfive/style.css?ver=1.3, Match: 'Version: 1.3'
+
+[32m[+][0m Enumerating Vulnerable Plugins (via Passive and Aggressive Methods)
+
+ Checking Known Locations -: |=================================================|
+[34m[i][0m No plugins Found.
+[32m[+][0m Enumerating Vulnerable Themes (via Passive and Aggressive Methods)
+
+ Checking Known Locations -: |=================================================|
+[34m[i][0m No themes Found.
+[32m[+][0m Enumerating Users (via Passive and Aggressive Methods)
+
+[32m[+][0m admin
+ | Found By: Rss Generator (Passive Detection)
+
+ Brute Forcing Author IDs -: |=================================================|
+[34m[i][0m 1 user(s) Identified.
+[32m[+][0m WPScan DB API OK
+ | Plan: free
+ | Requests Done (during the scan): 2
+ | Requests Remaining: 11
+[32m[+][0m Finished: Wed May 20 08:19:47 2026
+[32m[+][0m Requests Done: 8053
+[32m[+][0m Cached Requests: 9
+[32m[+][0m Most response codes received: 404: 8025, 200: 25, 403: 2, 302: 1
+[32m[+][0m Data Sent: 2.163 MB
+[32m[+][0m Data Received: 2.045 MB
+[32m[+][0m Memory used: 309.613 MB
+[32m[+][0m Elapsed time: 00:00:14

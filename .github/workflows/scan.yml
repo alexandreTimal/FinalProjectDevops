@@ -1,0 +1,72 @@
+name: WordPress WPScan
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  wpscan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Start WordPress stack
+        run: docker compose -f docker/docker-compose.yml up -d
+
+      - name: Wait for WordPress
+        run: |
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/ || echo "000")
+            if [ "$code" = "200" ] || [ "$code" = "302" ]; then
+              echo "WordPress is up after ${i} tries"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "WordPress did not start in time"
+          docker compose -f docker/docker-compose.yml logs
+          exit 1
+
+      - name: Install WordPress
+        run: |
+          curl -s -X POST "http://localhost:8080/wp-admin/install.php?step=2" \
+            --data-urlencode "weblog_title=DSO Lab" \
+            --data-urlencode "user_name=admin" \
+            --data-urlencode "admin_password=LabAdmin2026!" \
+            --data-urlencode "admin_password2=LabAdmin2026!" \
+            --data-urlencode "pw_weak=1" \
+            --data-urlencode "admin_email=admin@example.com" \
+            --data-urlencode "Submit=Install WordPress" \
+            --data-urlencode "language=" -o /dev/null
+
+      - name: Run WPScan
+        run: |
+          mkdir -p scans/ci
+          chmod 777 scans/ci
+          set +e
+          docker run --rm --network host -v "$PWD/scans/ci:/out" wpscanteam/wpscan \
+            --url http://localhost:8080 \
+            --enumerate u,vp,vt \
+            --plugins-detection mixed \
+            --api-token "${{ secrets.WPSCAN_API_TOKEN }}" \
+            --no-banner --format json --output /out/wpscan.json
+          rc=$?
+          # WPScan exit codes: 0=clean, 5=vulnerabilities found (expected), others=error
+          if [ "$rc" -ne 0 ] && [ "$rc" -ne 5 ]; then
+            echo "WPScan failed with exit code $rc"
+            exit $rc
+          fi
+          set -e
+          echo "--- Summary ---"
+          jq -r '.version.number as $v | "WordPress version: \($v)\nVulnerabilities (core): \(.version.vulnerabilities | length)\nPlugins found: \(.plugins | length)"' scans/ci/wpscan.json
+          echo "--- Core vulnerabilities ---"
+          jq -r '.version.vulnerabilities[]?.title' scans/ci/wpscan.json
+
+      - name: Upload scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wpscan-report
+          path: scans/ci/

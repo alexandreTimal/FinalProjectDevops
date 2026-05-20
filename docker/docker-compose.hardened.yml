@@ -1,0 +1,33 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: wp-db-hardened
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wpuser
+      MYSQL_PASSWORD: wppass
+    volumes:
+      - db_data_h:/var/lib/mysql
+    restart: unless-stopped
+
+  wordpress:
+    build: .
+    image: wordpress-hardened:latest
+    container_name: wp-site-hardened
+    depends_on:
+      - db
+    ports:
+      - "8081:8080"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: wppass
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wp_data_h:/var/www/html
+    restart: unless-stopped
+
+volumes:
+  db_data_h:
+  wp_data_h:
